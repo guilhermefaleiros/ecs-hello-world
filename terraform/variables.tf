@@ -40,12 +40,6 @@ variable "log_group_name" {
   default     = "/ecs/fargate-task"
 }
 
-variable "task_family_name" {
-  description = "Family name for the ECS task definition"
-  type        = string
-  default     = "ecs-hello-world-task"
-}
-
 variable "task_cpu" {
   description = "CPU units for the ECS task"
   type        = number
