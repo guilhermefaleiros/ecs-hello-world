@@ -42,7 +42,7 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
 
   container_definitions = jsonencode([
     {
-      name        = "${var.project_name}",
+      name        = var.project_name,
       image       = "${aws_ecr_repository.ecr_repository.repository_url}:latest",
       cpu         = var.task_cpu,
       memory      = var.task_memory,
