@@ -10,7 +10,7 @@ env:
   ECR_REPOSITORY: "ecs-hello-world"
   CLUSTER_NAME: "ecs-hello-world-cluster"
   SERVICE_NAME: "ecs-hello-world-service"
-  CONTAINER_NAME: "ecs-hello-world-container"
+  CONTAINER_NAME: "ecs-hello-world"
   TASK_DEFINITION_NAME: "ecs-hello-world-task-definition"
 
 jobs:
