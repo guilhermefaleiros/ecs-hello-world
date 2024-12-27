@@ -14,9 +14,12 @@ env:
   TASK_DEFINITION_NAME: "ecs-hello-world-task-definition"
 
 jobs:
-  build:
-    name: Build and Push Docker Image
+  setup:
+    name: Setup Environment
     runs-on: ubuntu-latest
+    outputs:
+      ecr_registry: ${{ steps.login-ecr.outputs.registry }}
+      image_tag: ${{ github.sha }}
     steps:
       - name: Check out code
         uses: actions/checkout@v4.1.5
@@ -32,15 +35,28 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+  build:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4.1.5
+
       - name: Build, tag, and push docker image to Amazon ECR
         env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REGISTRY: ${{ needs.setup.outputs.ecr_registry }}
           REPOSITORY: ${{ env.ECR_REPOSITORY }}
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ needs.setup.outputs.image_tag }}
         run: |
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
+  deploy:
+    name: Deploy ECS Task
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
       - name: Download task definition
         run: |
           aws ecs describe-task-definition --task-definition ${{ env.TASK_DEFINITION_NAME }} --query taskDefinition > task-definition.json
@@ -51,7 +67,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          image: ${{ needs.setup.outputs.ecr_registry }}/${{ env.ECR_REPOSITORY }}:${{ needs.setup.outputs.image_tag }}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
