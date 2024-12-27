@@ -71,4 +71,11 @@ jobs:
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ needs.build.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ needs.build.outputs.image_tag }}
 
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.SERVICE_NAME }}
+          cluster: ${{ env.CLUSTER_NAME }}
+
 
