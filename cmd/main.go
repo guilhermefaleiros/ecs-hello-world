@@ -16,7 +16,13 @@ func main() {
 
 	r.GET("/hello", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"message": "world 3",
+			"message": "world",
+		})
+	})
+
+	r.GET("/v2/hello", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "world v2",
 		})
 	})
 
