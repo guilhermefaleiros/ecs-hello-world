@@ -3,68 +3,68 @@ resource "aws_ecr_repository" "ecr_repository" {
   image_tag_mutability = "MUTABLE"
 }
 
-# # IAM Role for ECS Task Execution
-# resource "aws_iam_role" "ecs_task_execution_role" {
-#   name = "${var.project_name}-ecs-task-execution-role"
+# IAM Role for ECS Task Execution
+resource "aws_iam_role" "ecs_task_execution_role" {
+  name = "${var.project_name}-ecs-task-execution-role"
 
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17",
-#     Statement = [
-#       {
-#         Effect    = "Allow",
-#         Principal = { Service = "ecs-tasks.amazonaws.com" },
-#         Action    = "sts:AssumeRole"
-#       }
-#     ]
-#   })
-# }
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect    = "Allow",
+        Principal = { Service = "ecs-tasks.amazonaws.com" },
+        Action    = "sts:AssumeRole"
+      }
+    ]
+  })
+}
 
-# resource "aws_iam_policy_attachment" "ecs_task_execution_policy" {
-#   name       = "${var.project_name}-ecs-task-execution-policy"
-#   roles      = [aws_iam_role.ecs_task_execution_role.name]
-#   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-# }
+resource "aws_iam_policy_attachment" "ecs_task_execution_policy" {
+  name       = "${var.project_name}-ecs-task-execution-policy"
+  roles      = [aws_iam_role.ecs_task_execution_role.name]
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
 
-# # CloudWatch Log Group
-# resource "aws_cloudwatch_log_group" "ecs_log_group" {
-#   name              = var.log_group_name
-#   retention_in_days = 1
-# }
+# CloudWatch Log Group
+resource "aws_cloudwatch_log_group" "ecs_log_group" {
+  name              = var.log_group_name
+  retention_in_days = 1
+}
 
-# # ECS Task Definition
-# resource "aws_ecs_task_definition" "ecs_task_definition" {
-#   family                   = "${var.project_name}-task-definition"
-#   requires_compatibilities = ["FARGATE"]
-#   cpu                      = var.task_cpu
-#   memory                   = var.task_memory
-#   network_mode             = "awsvpc"
-#   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+# ECS Task Definition
+resource "aws_ecs_task_definition" "ecs_task_definition" {
+  family                   = "${var.project_name}-task-definition"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = var.task_cpu
+  memory                   = var.task_memory
+  network_mode             = "awsvpc"
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
 
-#   container_definitions = jsonencode([
-#     {
-#       name        = var.project_name,
-#       image       = "${aws_ecr_repository.ecr_repository.repository_url}:latest",
-#       cpu         = var.task_cpu,
-#       memory      = var.task_memory,
-#       essential   = true,
-#       portMappings = [
-#         {
-#           containerPort = var.container_port,
-#           hostPort      = var.container_port,
-#           protocol      = "tcp"
-#         }
-#       ],
-#       logConfiguration = {
-#         logDriver = "awslogs",
-#         options = {
-#           "awslogs-group"         = var.log_group_name,
-#           "awslogs-region"        = var.region,
-#           "awslogs-stream-prefix" = var.project_name
-#         }
-#       }
-#     }
-#   ])
-# }
+  container_definitions = jsonencode([
+    {
+      name        = var.project_name,
+      image       = "${aws_ecr_repository.ecr_repository.repository_url}:latest",
+      cpu         = var.task_cpu,
+      memory      = var.task_memory,
+      essential   = true,
+      portMappings = [
+        {
+          containerPort = var.container_port,
+          hostPort      = var.container_port,
+          protocol      = "tcp"
+        }
+      ],
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          "awslogs-group"         = var.log_group_name,
+          "awslogs-region"        = var.region,
+          "awslogs-stream-prefix" = var.project_name
+        }
+      }
+    }
+  ])
+}
 
 # # VPC
 # module "vpc" {
