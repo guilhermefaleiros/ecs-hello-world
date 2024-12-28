@@ -120,5 +120,5 @@ The following environment variables can be updated to customize the deployment:
 - TASK_DEFINITION_NAME: The ECS task definition name.
 - CONTAINER_NAME: The name of the container in the ECS task definition.
 
-Update these variables in .github/workflows/ci-cd.yml and variables.tf as needed.
+Update these variables in .github/workflows/main.yml and variables.tf as needed.
 
